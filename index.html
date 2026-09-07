@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Life OS // Mobil Arxitektura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f7f4ed;
+            --card-bg: #fffdf9;
+            --border-color: #2b2b2b;
+            --text-main: #2b2b2b;
+            --text-muted: #6b6b6b;
+            --accent: #2b2b2b;
+            --accent-light: #eae5d9;
+            --shadow: 4px 4px 0px #2b2b2b;
+            --shadow-sm: 2px 2px 0px #2b2b2b;
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 12px 12px 85px 12px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            font-style: italic;
+            font-family: 'Caveat', cursive;
+        }
+
+        .app-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: -4px;
+        }
+
+        .status-badge {
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-color);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border: 2.5px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        /* Quote Card */
+        .quote-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quote-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            font-style: italic;
+            flex: 1;
+        }
+
+        .quote-icon {
+            font-size: 2.2rem;
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-style: italic;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: var(--accent-light);
+            border: 1.5px solid var(--border-color);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--border-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Timer Card */
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .timer-display {
+            font-size: 3.2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -1px;
+            margin: 10px 0;
+            font-family: 'Plus Jakarta Sans', monospace;
+        }
+
+        .timer-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.1s ease;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--border-color);
+            color: var(--card-bg);
+        }
+
+        /* Tasks Card */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .task-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .task-item {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            padding: 12px 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.2s;
+        }
+
+        .task-item.completed {
+            background: var(--accent-light);
+            opacity: 0.8;
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        .task-item.completed .task-checkbox {
+            background: var(--border-color);
+            color: #fff;
+        }
+
+        .task-item.completed .task-checkbox::after {
+            content: '✓';
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .task-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+        }
+
+        .task-delete:hover {
+            color: #ef4444;
+        }
+
+        .task-add-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .input-field {
+            flex: 1;
+            background: #fff;
+            border: 2px solid var(--border-color);
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .input-field:focus {
+            background: #fffdf9;
+        }
+
+        .btn-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--border-color);
+            color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .btn-icon:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 2.5px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 8px 12px 16px 12px;
+            z-index: 1000;
+            box-shadow: 0 -4px 0px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 12px;
+            transition: 0.2s;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item.active {
+            color: var(--text-main);
+            background: var(--accent-light);
+            border: 1.5px solid var(--border-color);
+        }
+
+        /* Views management */
+        .view-section {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        /* Extra features styles */
+        .habit-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1.5px solid var(--accent-light);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div>
+                <div class="app-title">Life OS</div>
+                <div class="app-subtitle">Mobil Arxitektura</div>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>Faol</span>
+            </div>
+        </div>
+
+        <!-- VIEW 1: ASOSIY (HOME) -->
+        <div id="view-asosiy" class="view-section active">
+            <!-- Quote -->
+            <div class="card quote-card">
+                <div class="quote-text" id="dailyQuote">
+                    "Bugungi mehnat ertangi erkinlikni yaratadi."
+                </div>
+                <i class="fa-solid fa-mountain-sun quote-icon"></i>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Bajarildi</div>
+                    <div class="metric-value" id="metricCompleted">0/4</div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressCompleted"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Fokus</div>
+                    <div class="metric-value" id="metricFocus">25m</div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Daraja</div>
+                    <div class="metric-value" id="metricRate">0%</div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressRate"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deep Work Timer -->
+            <div class="card">
+                <div class="timer-header">
+                    <span><i class="fa-solid fa-bolt"></i> Deep Work Timer</span>
+                    <i class="fa-solid fa-gear" style="cursor: pointer;" onclick="switchView('sozlama')"></i>
+                </div>
+                <div class="timer-display" id="timerDisplay">25:00</div>
+                <div class="timer-actions">
+                    <button class="btn btn-primary" id="timerStartBtn"><i class="fa-solid fa-play"></i> Boshlash</button>
+                    <button class="btn" id="timerResetBtn"><i class="fa-solid fa-rotate-right"></i> Qayta</button>
+                </div>
+            </div>
+
+            <!-- Kunlik Vazifalar -->
+            <div class="card">
+                <div class="section-header">
+                    <span>Kunlik Vazifalar</span>
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <ul class="task-list" id="taskList">
+                    <!-- Tasks injected by JS -->
+                </ul>
+                <div class="task-add-box">
+                    <input type="text" class="input-field" id="taskInput" placeholder="Yangi vazifa yozish...">
+                    <button class="btn-icon" id="addTaskBtn"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: MAQSAD (GOALS) -->
+        <div id="view-maqsad" class="view-section">
+            <div class="card">
+                <div class="section-header">
+                    <span>Asosiy Maqsadlar & O'sish</span>
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div class="habit-grid" id="goalsList">
+                    <!-- Dynamic goals -->
+                </div>
+                <div class="task-add-box" style="margin-top: 16px;">
+                    <input type="text" class="input-field" id="goalInput" placeholder="Yangi maqsad qo'shish...">
+                    <button class="btn-icon" id="addGoalBtn"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section-header">
+                    <span>Shaxsiy Arxiv & Qoidalar</span>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+                    Har bir kunlik kichik qadamlar — butun boshli kelajak arxitekturasini barpo etadi. Tartib va intizom har qanday muvaffaqiyatning kalitidir.
+                </p>
+            </div>
+        </div>
+
+        <!-- VIEW 3: STAT (STATISTICS) -->
+        <div id="view-stat" class="view-section">
+            <div class="card">
+                <div class="section-header">
+                    <span>Mahsuldorlik Tahlili</span>
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px;">
+                            <span>Haftalik bajarilish</span>
+                            <span id="statWeeklyPercent">0%</span>
+                        </div>
+                        <div class="progress-track" style="height: 10px;">
+                            <div class="progress-fill" id="statWeeklyFill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px;">
+                            <span>Fokus sessiyalari</span>
+                            <span id="statFocusCount">0 ta</span>
+                        </div>
+                        <div class="progress-track" style="height: 10px;">
+                            <div class="progress-fill" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                    <div style="background: var(--accent-light); padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); margin-top: 10px;">
+                        <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 4px;"><i class="fa-solid fa-lightbulb"></i> Tavsiya</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);" id="statTip">Vazifalarni o'z vaqtida bajarish transformatsiya tezligini oshiradi.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: SOZLAMA (SETTINGS) -->
+        <div id="view-sozlama" class="view-section">
+            <div class="card">
+                <div class="section-header">
+                    <span>Tizim Sozlamalari</span>
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div class="settings-item">
+                    <span>Pomodoro vaqti (daq)</span>
+                    <select id="timerDurationSelect" class="input-field" style="max-width: 100px; padding: 6px 10px;">
+                        <option value="15">15 daq</option>
+                        <option value="25" selected>25 daq</option>
+                        <option value="45">45 daq</option>
+                        <option value="60">60 daq</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <span>Ovozli xabarlar</span>
+                    <input type="checkbox" id="soundToggle" checked style="width: 20px; height: 20px; accent-color: var(--border-color);">
+                </div>
+                <div class="settings-item" style="border: none;">
+                    <span>Ma'lumotlarni tozalash</span>
+                    <button class="btn" style="padding: 6px 12px; font-size: 0.85rem;" onclick="resetAllData()">Tozalash</button>
+                </div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div style="font-weight: 700; font-size: 1rem; margin-bottom: 4px;">Life OS v2.5</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Elite Architecture & UI Master</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchView('asosiy', this)">
+            <i class="fa-solid fa-house"></i>
+            <span>Asosiy</span>
+        </button>
+        <button class="nav-item" onclick="switchView('maqsad', this)">
+            <i class="fa-solid fa-bullseye"></i>
+            <span>Maqsad</span>
+        </button>
+        <button class="nav-item" onclick="switchView('stat', this)">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Stat</span>
+        </button>
+        <button class="nav-item" onclick="switchView('sozlama', this)">
+            <i class="fa-solid fa-gear"></i>
+            <span>Sozlama</span>
+        </button>
+    </nav>
+
+    <script>
+        // Navigation Handler
+        function switchView(viewName, btnElement) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + viewName).classList.add('active');
+
+            if(btnElement) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                btnElement.classList.add('active');
+            } else {
+                // Find matching nav item
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if(item.getAttribute('onclick').includes(viewName)) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // LocalStorage Data Management
+        let tasks = JSON.parse(localStorage.getItem('life_os_tasks')) || [
+            { text: "Maktabga borib kelish", completed: false },
+            { text: "To'garakka borish", completed: false },
+            { text: "Rasm chizish", completed: false },
+            { text: "Dars qilish", completed: false }
+        ];
+
+        let goals = JSON.parse(localStorage.getItem('life_os_goals')) || [
+            { text: "Arxitektura va dizaynni mukammal o'rganish", completed: false },
+            { text: "Har kuni 1 soat kitob o'qish", completed: false },
+            { text: "Jismoniy formani yaxshilash", completed: false }
+        ];
+
+        let focusCount = parseInt(localStorage.getItem('life_os_focus_count')) || 0;
+
+        function saveData() {
+            localStorage.setItem('life_os_tasks', JSON.stringify(tasks));
+            localStorage.setItem('life_os_goals', JSON.stringify(goals));
+            localStorage.setItem('life_os_focus_count', focusCount);
+            renderAll();
+        }
+
+        // Tasks Logic
+        const taskList = document.getElementById('taskList');
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            let completedCount = 0;
+
+            tasks.forEach((task, index) => {
+                if (task.completed) completedCount++;
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="task-checkbox" onclick="toggleTask(${index})"></div>
+                    <span class="task-text">${task.text}</span>
+                    <button class="task-delete" onclick="deleteTask(${index})"><i class="fa-solid fa-trash"></i></button>
+                `;
+                taskList.appendChild(li);
+            });
+
+            // Metrics update
+            const total = tasks.length;
+            document.getElementById('metricCompleted').innerText = `${completedCount}/${total}`;
+            const rate = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+            document.getElementById('metricRate').innerText = `${rate}%`;
+            document.getElementById('progressCompleted').style.width = `${rate}%`;
+            document.getElementById('progressRate').style.width = `${rate}%`;
+            
+            // Stat view updates
+            document.getElementById('statWeeklyPercent').innerText = `${rate}%`;
+            document.getElementById('statWeeklyFill').style.width = `${rate}%`;
+        }
+
+        function addTask() {
+            const text = taskInput.value.trim();
+            if(text) {
+                tasks.push({ text, completed: false });
+                taskInput.value = '';
+                saveData();
+            }
+        }
+
+        window.toggleTask = function(index) {
+            tasks[index].completed = !tasks[index].completed;
+            saveData();
+        }
+
+        window.deleteTask = function(index) {
+            tasks.splice(index, 1);
+            saveData();
+        }
+
+        addTaskBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
+
+        // Goals Logic
+        const goalsList = document.getElementById('goalsList');
+        const goalInput = document.getElementById('goalInput');
+        const addGoalBtn = document.getElementById('addGoalBtn');
+
+        function renderGoals() {
+            goalsList.innerHTML = '';
+            goals.forEach((goal, index) => {
+                const li = document.createElement('div');
+                li.className = `task-item ${goal.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="task-checkbox" onclick="toggleGoal(${index})"></div>
+                    <span class="task-text">${goal.text}</span>
+                    <button class="task-delete" onclick="deleteGoal(${index})"><i class="fa-solid fa-trash"></i></button>
+                `;
+                goalsList.appendChild(li);
+            });
+        }
+
+        function addGoal() {
+            const text = goalInput.value.trim();
+            if(text) {
+                goals.push({ text, completed: false });
+                goalInput.value = '';
+                saveData();
+            }
+        }
+
+        window.toggleGoal = function(index) {
+            goals[index].completed = !goals[index].completed;
+            saveData();
+        }
+
+        window.deleteGoal = function(index) {
+            goals.splice(index, 1);
+            saveData();
+        }
+
+        addGoalBtn.addEventListener('click', addGoal);
+        goalInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addGoal(); });
+
+        // Timer Logic
+        let selectedDuration = parseInt(document.getElementById('timerDurationSelect').value) * 60;
+        let timeLeft = selectedDuration;
+        let timerInterval = null;
+        let isRunning = false;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerStartBtn = document.getElementById('timerStartBtn');
+        const timerResetBtn = document.getElementById('timerResetBtn');
+        const timerDurationSelect = document.getElementById('timerDurationSelect');
+
+        timerDurationSelect.addEventListener('change', () => {
+            if(!isRunning) {
+                selectedDuration = parseInt(timerDurationSelect.value) * 60;
+                timeLeft = selectedDuration;
+                updateTimerDisplay();
+                document.getElementById('metricFocus').innerText = `${timerDurationSelect.value}m`;
+            }
+        });
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        timerStartBtn.addEventListener('click', () => {
+            if(isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                timerStartBtn.innerHTML = '<i class="fa-solid fa-play"></i> Boshlash';
+            } else {
+                isRunning = true;
+                timerStartBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pauza';
+                timerInterval = setInterval(() => {
+                    if(timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        focusCount++;
+                        saveData();
+                        document.getElementById('statFocusCount').innerText = `${focusCount} ta`;
+                        alert("Fokus sessiyasi muvaffaqiyatli yakunlandi! Ajoyib natija.");
+                        timeLeft = selectedDuration;
+                        updateTimerDisplay();
+                        timerStartBtn.innerHTML = '<i class="fa-solid fa-play"></i> Boshlash';
+                    }
+                }, 1000);
+            }
+        });
+
+        timerResetBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = selectedDuration;
+            updateTimerDisplay();
+            timerStartBtn.innerHTML = '<i class="fa-solid fa-play"></i> Boshlash';
+        });
+
+        function renderAll() {
+            renderTasks();
+            renderGoals();
+            document.getElementById('statFocusCount').innerText = `${focusCount} ta`;
+        }
+
+        window.resetAllData = function() {
+            if(confirm("Barcha ma'lumotlarni tozalashni tasdiqlaysizmi?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        renderAll();
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
